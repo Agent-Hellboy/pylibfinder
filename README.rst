@@ -16,17 +16,18 @@ Example
 
 .. code:: py
 
-      The library provides an API to find where print is defined 
-      >>> spotter.get_module('print')
-      Keyword: print
-      Module: builtins, Function: print
-
-
+      >>> import spotter
       >>> spotter.get_module('literal')
-      Keyword: literal
-      Module: ast, Function: literal_eval
-      Module: re._compiler, Function: _get_literal_prefix
+      [{'Module': 'ast', 'Function': 'literal_eval'}, {'Module': 're._compiler', 'Function': '_get_literal_prefix'}]
+      >>> 
 
+
+Development 
+============
+make changes in spotter.c 
+compile it using `gcc -shared -o spotter.so -fPIC -I /usr/include/python3.12 spotter.c`
+it will generate a spotter.so 
+open repl and test  
 
 Contributing
 ============

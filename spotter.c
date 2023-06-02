@@ -17,8 +17,6 @@ static PyObject* get_module(PyObject* self, PyObject* args) {
         return NULL;
     }
 
-    printf("Keyword: %s\n", keyword);
-
     // Regular expression pattern to match the keyword
     const char* pattern = keyword;
 
@@ -26,7 +24,7 @@ static PyObject* get_module(PyObject* self, PyObject* args) {
     regex_t regex;
     int ret = regcomp(&regex, pattern, REG_EXTENDED | REG_NOSUB);
     if (ret != 0) {
-        printf("Got a Runtime error\n");
+            PyErr_SetString(PyExc_RuntimeError, "Failed to compile regular expression");
         return NULL;
     }
     // validation of function name 
@@ -59,18 +57,32 @@ static PyObject* get_module(PyObject* self, PyObject* args) {
     // Clean up the regular expression
     regfree(&regex);
 
-    // Print the modules and function names
     Py_ssize_t module_count = PyList_Size(module_list);
+    PyObject* result_list = PyList_New(0);  // List to store dictionaries
+
     for (Py_ssize_t i = 0; i < module_count; i++) {
         PyObject* capsule = PyList_GetItem(module_list, i);
         FunctionInfo* info = (FunctionInfo*)PyCapsule_GetPointer(capsule, NULL);
-        printf("Module: %s, Function: %s\n", info->module_name, info->function_name);
+
+        PyObject* module_name = PyUnicode_FromString(info->module_name);  // Convert module name to Python object
+        PyObject* function_name = PyUnicode_FromString(info->function_name);  // Convert function name to Python object
+
+        // Create a dictionary for the module and function pair
+        PyObject* dict_item = PyDict_New();
+        PyDict_SetItemString(dict_item, "Module", module_name);
+        PyDict_SetItemString(dict_item, "Function", function_name);
+
+        // Append the dictionary to the result list
+        PyList_Append(result_list, dict_item);
+
         free(info);
     }
 
     // Clean up and return
     Py_XDECREF(module_list);
-    Py_RETURN_NONE;
+    return result_list;
+
+
 }
 
 static PyMethodDef module_methods[] = {
