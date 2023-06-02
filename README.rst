@@ -7,8 +7,8 @@ Library to spot a keyword as a function inside python stdlib
 Installation
 ============
  
-   - git clone https://github.com/Agent-Hellboy/
-   - cd trace-dkey 
+   - git clone https://github.com/Agent-Hellboy/spotter
+   - cd spotter
    - sudo python3 setup.py install 
 
 Example
