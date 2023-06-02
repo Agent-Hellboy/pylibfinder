@@ -16,7 +16,7 @@ Example
 
 .. code:: py
 
-      The library provides an API to find where print is defined 
+      The library provides an API to find where function like print is defined 
       >>> spotter.get_module('print')
       Keyword: print
       Module: builtins, Function: print
