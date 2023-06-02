@@ -24,10 +24,10 @@ Example
 
 Development 
 ============
-make changes in spotter.c 
-compile it using `gcc -shared -o spotter.so -fPIC -I /usr/include/python3.12 spotter.c`
-it will generate a spotter.so 
-open repl and test  
+ *  make changes in spotter.c 
+ *  compile it using `gcc -shared -o spotter.so -fPIC -I /usr/include/python3.12 spotter.c`
+ *  it will generate a spotter.so 
+ * open repl and test  
 
 Contributing
 ============
