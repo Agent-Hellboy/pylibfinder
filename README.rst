@@ -1,10 +1,10 @@
 pylibfinder
 ===========
 
-  - pylibfinder is a Python library that allows you to spot a keyword as a function inside the Python standard library. 
-  - It provides a convenient way to search for functions that match a given keyword within the standard library modules.
-  - With pylibfinder, you can easily identify the modules and functions that are available in Python and gain insights  into their usage and availability. 
-  - This library is designed to assist developers in finding relevant functions and understanding the   Python standard library better.
+- pylibfinder is a Python library that allows you to spot a keyword as a function inside the Python standard library. 
+- It provides a convenient way to search for functions that match a given keyword within the standard library modules.
+- With pylibfinder, you can easily identify the modules and functions that are available in Python and gain insights  into their usage and availability. 
+- This library is designed to assist developers in finding relevant functions and understanding the   Python standard library better.
 
 
 .. image:: https://img.shields.io/pypi/v/pylibfinder
