@@ -1,25 +1,24 @@
-import unittest
+import pytest
 import spotter
 
-class SpotterTestCase(unittest.TestCase):
-    def test_get_module(self):
-        keyword = "eval"  # Replace with your desired keyword
-        result = spotter.get_module(keyword)
-        
-        # Assert that the result is a list
-        self.assertIsInstance(result, list)
-        
-        # Assert that each item in the list is a dictionary
-        for item in result:
-            self.assertIsInstance(item, dict)
-            
-            # Assert that each dictionary contains the "Module" and "Function" keys
-            self.assertIn("Module", item)
-            self.assertIn("Function", item)
-            
-            # Assert that the values of "Module" and "Function" are strings
-            self.assertIsInstance(item["Module"], str)
-            self.assertIsInstance(item["Function"], str)
+@pytest.fixture
+def keyword():
+    return "eval"  
 
-if __name__ == "__main__":
-    unittest.main()
+def test_get_module(keyword):
+    result = spotter.get_module(keyword)
+
+    # Assert that the result is a list
+    assert isinstance(result, list)
+
+    # Assert that each item in the list is a dictionary
+    for item in result:
+        assert isinstance(item, dict)
+
+        # Assert that each dictionary contains the "Module" and "Function" keys
+        assert "Module" in item
+        assert "Function" in item
+
+        # Assert that the values of "Module" and "Function" are strings
+        assert isinstance(item["Module"], str)
+        assert isinstance(item["Function"], str)
