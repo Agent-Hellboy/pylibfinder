@@ -7,6 +7,7 @@ def main():
         description="Library to spot a keyword as a function inside python stdlib",
         author="Prince Roshan",
         author_email="princekrroshan01@gmail.com",
+        license="MIT",
         ext_modules=[Extension("funcfinder", ["funcfinder.c"])],
         keywords=[
             "C-extension"
