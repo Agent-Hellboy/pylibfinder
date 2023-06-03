@@ -31,7 +31,8 @@ Installation
 
 For stable version
 
-        pip install pylibfinder
+        pip install pylibfinder (on Linux)
+        python3 setup.py install (on Mac)
 
 For developement
 
