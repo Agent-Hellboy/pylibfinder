@@ -32,7 +32,7 @@ Installation
 For stable version
 
         - pip install pylibfinder (on Linux)
-        - python3 setup.py install (on Mac)
+        - clone the repo cd `pylibfinder` then do python3 setup.py install (on Mac)
 
 For developement
 
