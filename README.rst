@@ -1,4 +1,4 @@
-pylibfinder (currently supports 3.10 and 3.11)
+pylibfinder (currently supports 3.10 and 3.11 on posix and mac)
 ===========
 
 - pylibfinder is a Python library that allows you to spot a keyword as a function inside the Python standard library. 
