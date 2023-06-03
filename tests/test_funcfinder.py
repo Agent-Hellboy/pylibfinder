@@ -1,12 +1,12 @@
 import pytest
-import spotter
+import funcfinder
 
 @pytest.fixture
 def keyword():
     return "eval"  
 
 def test_get_module(keyword):
-    result = spotter.get_module(keyword)
+    result = funcfinder.get_module(keyword)
 
     # Assert that the result is a list
     assert isinstance(result, list)

@@ -98,6 +98,6 @@ static struct PyModuleDef module_definition = {
     module_methods
 };
 
-PyMODINIT_FUNC PyInit_spotter(void) {
+PyMODINIT_FUNC PyInit_funcfinder(void) {
     return PyModule_Create(&module_definition);
 }

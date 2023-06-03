@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11","3.12"]
 
     steps:
     - uses: actions/checkout@v3
@@ -40,7 +40,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Generate .so package for testing
       run: |
-        gcc -fPIC -shared -o spotter.so -I /usr/include/python${{ matrix.python-version }} spotter.c -lpython${{ matrix.python-version }}
+        gcc -fPIC -shared -o funcfinder.so -I /usr/include/python${{ matrix.python-version }} funcfinder.c -lpython${{ matrix.python-version }}
     - name: Test with pytest
       run: |
         pytest
