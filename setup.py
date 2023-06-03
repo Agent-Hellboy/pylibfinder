@@ -12,6 +12,7 @@ def main():
         long_description_content_type="text/x-rst",
         author="Prince Roshan",
         author_email="princekrroshan01@gmail.com",
+        license="MIT",
         ext_modules=[Extension("funcfinder", ["funcfinder.c"])],
         keywords=[
             "C-extension"
