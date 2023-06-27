@@ -1,4 +1,4 @@
-pylibfinder (currently supports 3.10 and 3.11 on posix and mac)
+pylibfinder (currently supports 3.10 and 3.11 on posix)
 ===========
 
 - pylibfinder is a Python library that allows you to spot a keyword as a function inside the Python standard library. 
@@ -31,7 +31,6 @@ Installation
 
 For stable version
 
-        - pip install pylibfinder (on Linux)
         - clone the repo cd `pylibfinder` then do python3 setup.py install (on Mac)
 
 For developement
@@ -42,8 +41,6 @@ For developement
         - compile it using `gcc -shared -o funcfinder.so -fPIC -I /usr/include/python3.12 funcfinder.c`
         - it will generate a funcfinder.so 
         - open repl and test  
-
-
 
 
 Example
