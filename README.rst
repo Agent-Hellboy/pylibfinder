@@ -31,7 +31,7 @@ Installation
 
 For stable version
 
-        - clone the repo cd `pylibfinder` then do python3 setup.py install (on Mac)
+        - clone the repo cd `pylibfinder` then do python3 setup.py install (on Mac and linux)
 
 For developement
 
