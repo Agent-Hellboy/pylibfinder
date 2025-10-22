@@ -131,6 +131,7 @@ static PyObject* find_similar(PyObject* self, PyObject* args) {
     while (PyDict_Next(modules_dict, &pos, &key, &value)) {
         PyObject *dir_result = PyObject_Dir(value);
         if (dir_result == NULL) {
+            PyErr_Clear();
             continue;
         }
 
@@ -139,7 +140,10 @@ static PyObject* find_similar(PyObject* self, PyObject* args) {
             PyObject *item = PyList_GetItem(dir_result, i);
             const char *function_name = PyUnicode_AsUTF8(item);
 
-            if (function_name == NULL) continue;
+            if (function_name == NULL) {
+                PyErr_Clear();
+                continue;
+            }
 
             const char *module_name = PyModule_GetName(value);
             if (module_name == NULL) continue;
