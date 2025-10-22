@@ -1,86 +1,8 @@
 #include <Python.h>
-#include <regex.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "module_scanner.h"
-
-/* ========== KEYWORD MATCHING ========== */
-
-typedef struct {
-    regex_t regex;
-    int is_valid;
-} KeywordContext;
-
-static int keyword_processor(const char *module_name,
-                            const char *function_name,
-                            PyObject *result_list,
-                            void *user_data) {
-    // user_data contains the KeywordContext
-    KeywordContext *ctx = (KeywordContext *)user_data;
-
-    if (!ctx || !ctx->is_valid) return 0;
-
-    if (regexec(&ctx->regex, function_name, 0, NULL, 0) == 0) {
-        PyObject *dict_item = create_match_dict(module_name, function_name, 0);
-        if (dict_item) {
-            PyList_Append(result_list, dict_item);
-            Py_DECREF(dict_item);
-        }
-    }
-
-    return 0;
-}
-
-static PyObject* get_module(PyObject* self, PyObject* args) {
-    const char* keyword;
-
-    if (!PyArg_ParseTuple(args, "s", &keyword)) {
-        return NULL;
-    }
-
-    PyObject* result_list = PyList_New(0);
-
-    KeywordContext ctx;
-    int ret = regcomp(&ctx.regex, keyword, REG_EXTENDED | REG_NOSUB);
-    if (ret != 0) {
-        PyErr_SetString(PyExc_RuntimeError, "Failed to compile regular expression");
-        Py_DECREF(result_list);
-        return NULL;
-    }
-    ctx.is_valid = 1;
-
-    // Create a custom scan that handles both result list and context
-    PyObject *modules_dict = PyImport_GetModuleDict();
-    Py_ssize_t pos = 0;
-    PyObject *key, *value;
-
-    while (PyDict_Next(modules_dict, &pos, &key, &value)) {
-        PyObject *dir_result = PyObject_Dir(value);
-        if (dir_result == NULL) {
-            continue;
-        }
-
-        Py_ssize_t len = PyList_Size(dir_result);
-        for (Py_ssize_t i = 0; i < len; i++) {
-            PyObject *item = PyList_GetItem(dir_result, i);
-            const char *function_name = PyUnicode_AsUTF8(item);
-
-            if (function_name == NULL) continue;
-
-            const char *module_name = PyModule_GetName(value);
-            if (module_name == NULL) continue;
-
-            // Call processor with context
-            keyword_processor(module_name, function_name, result_list, (void *)&ctx);
-        }
-        Py_DECREF(dir_result);
-    }
-
-    regfree(&ctx.regex);
-
-    return result_list;
-}
 
 /* ========== SIMILARITY MATCHING ========== */
 
@@ -234,15 +156,14 @@ static PyObject* find_similar(PyObject* self, PyObject* args) {
 /* ========== MODULE DEFINITION ========== */
 
 static PyMethodDef module_methods[] = {
-    {"get_module", get_module, METH_VARARGS, "Find functions matching a regex keyword."},
-    {"find_similar", find_similar, METH_VARARGS, "Find similar functions using semantic similarity."},
+    {"find_similar", find_similar, METH_VARARGS, "Find similar functions in Python stdlib using semantic similarity. Optional threshold parameter (0.0-1.0, default 0.5)."},
     {NULL, NULL, 0, NULL}
 };
 
 static struct PyModuleDef module_definition = {
     PyModuleDef_HEAD_INIT,
     "pylibfinder",
-    "Find functions in Python stdlib by keyword or semantic similarity",
+    "Find functions in Python stdlib by semantic similarity",
     -1,
     module_methods
 };

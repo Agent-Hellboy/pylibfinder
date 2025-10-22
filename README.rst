@@ -78,32 +78,23 @@ For development
 Example
 =======
 
-**Exact keyword matching:**
+**Semantic similarity search - Find similar functions:**
 
 .. code:: py
 
-      >>> import funcfinder
-      >>> funcfinder.get_module('literal')
-      [{'Module': 'ast', 'Function': 'literal_eval'}, {'Module': 're._compiler', 'Function': '_get_literal_prefix'}]
-      >>>
-
-**Semantic similarity search (find similar functions):**
-
-.. code:: py
-
-      >>> import similarity_finder
+      >>> import pylibfinder
       >>>
       >>> # Search for 'power' to find math functions
-      >>> similarity_finder.find_similar('power', threshold=0.5)
+      >>> pylibfinder.find_similar('power', threshold=0.5)
       [{'Module': 'builtins', 'Function': 'pow', 'Similarity': 0.6}]
       >>>
       >>> # Search for 'print'
-      >>> result = similarity_finder.find_similar('print', threshold=0.5)
+      >>> result = pylibfinder.find_similar('print', threshold=0.5)
       >>> result[0]
       {'Module': 'builtins', 'Function': 'print', 'Similarity': 1.0}
       >>>
       >>> # Find functions similar to 'parseInt' (Java function)
-      >>> similarity_finder.find_similar('parseInt', threshold=0.6)
+      >>> pylibfinder.find_similar('parseInt', threshold=0.6)
       [{'Module': 're._parser', 'Function': '_parse_sub', 'Similarity': 0.6}]
       >>>
 
