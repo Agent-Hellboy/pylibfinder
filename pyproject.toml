@@ -31,6 +31,10 @@ py-modules = []
 name = "funcfinder"
 sources = ["funcfinder.c"]
 
+[[tool.setuptools.ext-modules]]
+name = "similarity_finder"
+sources = ["similarity_finder.c"]
+
 [tool.ruff]
 line-length = 120
 target-version = "py310"
