@@ -37,7 +37,7 @@ def test_find_similar_basic(query):
 
 def test_find_similar_with_threshold():
     """Test semantic similarity with custom threshold."""
-    result = pylibfinder.find_similar("print", threshold=0.9)
+    result = pylibfinder.find_similar("print", 0.9)
 
     # Assert that the result is a list
     assert isinstance(result, list)
@@ -49,7 +49,7 @@ def test_find_similar_with_threshold():
 
 def test_find_similar_exact_match():
     """Test exact match returns high similarity."""
-    result = pylibfinder.find_similar("print", threshold=0.5)
+    result = pylibfinder.find_similar("print", 0.5)
 
     # Find the exact match in results
     exact_match = None
@@ -67,7 +67,7 @@ def test_find_similar_exact_match():
 
 def test_find_similar_substring_match():
     """Test that substring matches get boosted similarity."""
-    result = pylibfinder.find_similar("print_function", threshold=0.5)
+    result = pylibfinder.find_similar("print_function", 0.5)
 
     # Assert that we found results
     assert len(result) > 0
