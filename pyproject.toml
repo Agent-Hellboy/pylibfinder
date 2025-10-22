@@ -28,12 +28,9 @@ classifiers = [
 py-modules = []
 
 [[tool.setuptools.ext-modules]]
-name = "funcfinder"
-sources = ["funcfinder.c"]
-
-[[tool.setuptools.ext-modules]]
-name = "similarity_finder"
-sources = ["similarity_finder.c"]
+name = "pylibfinder"
+sources = ["src/pylibfinder.c", "src/module_scanner.c"]
+include-dirs = ["src"]
 
 [tool.ruff]
 line-length = 120
