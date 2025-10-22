@@ -10,7 +10,7 @@ static PyObject* get_module(PyObject* self, PyObject* args) {
     const char* keyword;
     PyObject* module = NULL;
     PyObject* function = NULL;
-    PyObject* module_list = PyList_New(0);  
+    PyObject* module_list = PyList_New(0);
 
     // Parse the keyword from the arguments
     if (!PyArg_ParseTuple(args, "s", &keyword)) {
@@ -27,7 +27,7 @@ static PyObject* get_module(PyObject* self, PyObject* args) {
             PyErr_SetString(PyExc_RuntimeError, "Failed to compile regular expression");
         return NULL;
     }
-    // validation of function name 
+    // validation of function name
 
     // Iterate through all loaded modules
     PyObject* modules_dict = PyImport_GetModuleDict();

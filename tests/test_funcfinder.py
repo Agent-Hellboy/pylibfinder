@@ -1,9 +1,11 @@
-import pytest
 import funcfinder
+import pytest
+
 
 @pytest.fixture
 def keyword():
-    return "eval"  
+    return "eval"
+
 
 def test_get_module(keyword):
     result = funcfinder.get_module(keyword)
