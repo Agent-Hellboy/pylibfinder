@@ -11,13 +11,25 @@ pylibfinder (supports Python 3.10 to 3.14 on POSIX)
    :target: https://pypi.python.org/pypi/pylibfinder/
 
 .. image:: https://github.com/Agent-Hellboy/pylibfinder/actions/workflows/test.yml/badge.svg
-    :target: https://github.com/Agent-Hellboy/pylibfinder/
+    :target: https://github.com/Agent-Hellboy/pylibfinder/actions/workflows/test.yml
 
 .. image:: https://img.shields.io/pypi/pyversions/pylibfinder.svg
    :target: https://pypi.python.org/pypi/pylibfinder/
 
-.. image:: https://img.shields.io/pypi/l/pylibfinder.svg
+.. image:: https://img.shields.io/pypi/wheel/pylibfinder.svg
    :target: https://pypi.python.org/pypi/pylibfinder/
+
+.. image:: https://img.shields.io/badge/C%20Extension-yes-brightgreen.svg
+   :target: https://github.com/Agent-Hellboy/pylibfinder
+
+.. image:: https://img.shields.io/badge/platform-macOS-blue.svg
+   :target: https://github.com/Agent-Hellboy/pylibfinder
+
+.. image:: https://img.shields.io/badge/platform-Linux-blue.svg
+   :target: https://github.com/Agent-Hellboy/pylibfinder
+
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://github.com/Agent-Hellboy/pylibfinder/blob/main/LICENSE
 
 .. image:: https://pepy.tech/badge/pylibfinder
    :target: https://pepy.tech/project/pylibfinder
