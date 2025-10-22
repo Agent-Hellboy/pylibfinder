@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pylibfinder"
-version = "0.2.0"
+version = "0.2.1"
 description = "Library to spot a keyword as a function inside python stdlib"
 readme = {file = "README.rst", content-type = "text/x-rst"}
 requires-python = ">=3.10"
