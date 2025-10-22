@@ -10,7 +10,7 @@ static PyObject* get_module(PyObject* self, PyObject* args) {
     const char* keyword;
     PyObject* module = NULL;
     PyObject* function = NULL;
-    PyObject* module_list = PyList_New(0);  // List to store matching modules
+    PyObject* module_list = PyList_New(0);  
 
     // Parse the keyword from the arguments
     if (!PyArg_ParseTuple(args, "s", &keyword)) {
