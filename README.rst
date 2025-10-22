@@ -44,16 +44,35 @@ For stable version
 
         - clone the repo: ``git clone https://github.com/Agent-Hellboy/pylibfinder``
         - cd into it: ``cd pylibfinder``
-        - install with pip: ``pip install .`` (on Mac and Linux)
+        - install with pip: ``pip install .`` (on macOS and Linux)
 
 For development
 
+**Recommended (Easy setup):**
+
         - git clone https://github.com/Agent-Hellboy/pylibfinder
         - cd pylibfinder
-        - make changes in funcfinder.c
-        - compile it using ``gcc -shared -o funcfinder.so -fPIC -I /usr/include/python3.13 funcfinder.c``
-        - it will generate a funcfinder.so
+        - ``pip install -e .`` (installs in editable mode with proper Python headers detection)
+        - make changes to ``funcfinder.c``
+        - reinstall with ``pip install -e .`` to rebuild
         - open repl and test
+
+**Manual compilation:**
+
+**macOS:**
+
+        - Install Homebrew Python: ``brew install python@3.13``
+        - Find Python include path: ``python3.13 -c "import sysconfig; print(sysconfig.get_path('include'))"``
+        - Compile: ``gcc -shared -o funcfinder.so -fPIC -I /opt/homebrew/opt/python@3.13/Frameworks/Python.framework/Versions/3.13/include/python3.13 funcfinder.c -lpython3.13``
+        - It will generate ``funcfinder.so``
+        - Test in Python REPL: ``python3.13 -c "import funcfinder; print(funcfinder.get_module('literal'))``
+
+**Linux:**
+
+        - Install Python dev package: ``sudo apt-get install python3.13-dev``
+        - Compile: ``gcc -shared -o funcfinder.so -fPIC -I /usr/include/python3.13 funcfinder.c``
+        - It will generate ``funcfinder.so``
+        - Test in Python REPL: ``python3.13 -c "import funcfinder; print(funcfinder.get_module('literal'))``
 
 
 Example
