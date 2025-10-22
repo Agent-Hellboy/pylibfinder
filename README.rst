@@ -34,8 +34,7 @@ pylibfinder (supports Python 3.10 to 3.14 on POSIX)
 .. image:: https://pepy.tech/badge/pylibfinder
    :target: https://pepy.tech/project/pylibfinder
 
-.. image:: https://img.shields.io/pypi/format/pylibfinder.svg
-   :target: https://pypi.python.org/pypi/pylibfinder/
+
 
 Installation
 ============
