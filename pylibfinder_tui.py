@@ -29,7 +29,10 @@ class SearchInput(Static):
     """Search input area"""
 
     def compose(self) -> ComposeResult:
-        yield Input(placeholder="Enter keyword (e.g., power, print, parseInt)", id="search-input")
+        yield Input(
+            placeholder="Enter keyword (e.g., power, print, parseInt) with optional threshold and include_private flag",
+            id="search-input",
+        )
 
 
 class SearchApp(App):
@@ -102,21 +105,30 @@ class SearchApp(App):
         if not query:
             return
 
-        # Parse threshold if provided
-        parts = query.rsplit(" ", 1)
-        keyword = parts[0]
+        # Parse keyword, threshold, and include_private from user input
+        parts = query.split()
+        keyword = parts[0] if len(parts) > 0 else ""
         threshold = 0.5
+        include_private = False
 
         try:
-            if len(parts) == 2:
-                threshold = float(parts[1])
-                keyword = parts[0]
-        except ValueError:
+            if len(parts) > 1:
+                try:
+                    threshold = float(parts[1])
+                except ValueError:
+                    pass
+
+            if len(parts) > 2:
+                include_private = parts[2].lower() in ["true", "1", "yes"]
+        except Exception:
             pass
+
+        if not keyword:
+            return
 
         # Perform search
         try:
-            results = pylibfinder.find_similar(keyword, threshold)
+            results = pylibfinder.find_similar(keyword, threshold, include_private=include_private)
             self.display_results(results, keyword, threshold)
         except Exception as e:
             self.display_error(str(e))

@@ -98,6 +98,10 @@ Example
       >>> pylibfinder.find_similar('parseInt', 0.6)
       [{'Module': 're._parser', 'Function': '_parse_sub', 'Similarity': 0.6}]
       >>>
+      >>> # Include private APIs (functions starting with _) in search results
+      >>> pylibfinder.find_similar('parse', 0.5, include_private=True)
+      [{'Module': 'builtins', 'Function': 'compile', 'Similarity': 0.5}, {'Module': 're._parser', 'Function': '_parse_sub', 'Similarity': 0.8}, ...]
+      >>>
 
 
 
@@ -144,6 +148,7 @@ Then launch the interactive TUI:
 - ``power`` - Find power-related functions
 - ``print 0.8`` - Find functions similar to "print" with high confidence
 - ``parseInt 0.6`` - Find Java-style parseInt alternatives
+- ``parse 0.5 true`` - Find functions similar to "parse" including private APIs
 
 
 Contributing
