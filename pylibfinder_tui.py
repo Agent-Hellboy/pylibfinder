@@ -110,7 +110,6 @@ class SearchApp(App):
         try:
             if len(parts) == 2:
                 threshold = float(parts[1])
-                keyword = parts[0]
         except ValueError:
             pass
 
@@ -129,15 +128,25 @@ class SearchApp(App):
         if not results:
             return
 
-        # Sort by score descending
-        sorted_results = sorted(results, key=lambda x: x["Score"], reverse=True)
+        # Sort by similarity descending
+        sorted_results = sorted(results, key=lambda x: x["Similarity"], reverse=True)
 
         # Add rows to table
         for idx, result in enumerate(sorted_results, 1):
             func_name = result["Function"]
             module_name = result["Module"]
-            score = result["Score"]
+            score = result["Similarity"]
             percentage = f"{score*100:.1f}%"
+
+            # Determine color based on score
+            if score >= 0.9:
+                color = "green"
+            elif score >= 0.7:
+                color = "cyan"
+            elif score >= 0.5:
+                color = "yellow"
+            else:
+                color = "red"
 
             # Create progress bar
             bar_width = 10
@@ -145,7 +154,7 @@ class SearchApp(App):
             empty = bar_width - filled
             bar = "█" * filled + "░" * empty
 
-            table.add_row(str(idx), func_name, module_name, bar, percentage, key=str(idx))
+            table.add_row(str(idx), f"[{color}]{func_name}[/{color}]", module_name, bar, percentage, key=str(idx))
 
     def display_error(self, error: str) -> None:
         """Display error message"""
