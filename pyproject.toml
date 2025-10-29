@@ -24,8 +24,15 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 
+[project.scripts]
+pylibfinder-tui = "pylibfinder_tui:main"
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+tui = ["textual>=0.30.0"]
+
 [tool.setuptools]
-py-modules = []
+py-modules = ["pylibfinder_tui"]
 
 [[tool.setuptools.ext-modules]]
 name = "pylibfinder"
