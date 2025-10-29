@@ -105,18 +105,20 @@ class SearchApp(App):
         if not query:
             return
 
-        # Parse keyword, threshold, and include_private from user input
-        parts = query.split()
-        keyword = parts[0] if len(parts) > 0 else ""
+        # Parse threshold if provided
+        parts = query.rsplit(" ", 1)
+        keyword = parts[0]
         threshold = 0.5
         include_private = False
 
         try:
-            if len(parts) > 1:
-                try:
-                    threshold = float(parts[1])
-                except ValueError:
-                    pass
+            if len(parts) == 2:
+                threshold = float(parts[1])
+                keyword = parts[0]
+                # Validate threshold
+                if threshold < 0 or threshold > 1:
+                    self.notify("Threshold must be between 0 and 1", severity="warning")
+                    return
 
             if len(parts) > 2:
                 include_private = parts[2].lower() in ["true", "1", "yes"]
@@ -141,14 +143,14 @@ class SearchApp(App):
         if not results:
             return
 
-        # Sort by score descending
-        sorted_results = sorted(results, key=lambda x: x["Score"], reverse=True)
+        # Sort by score descending (handle missing Score key)
+        sorted_results = sorted(results, key=lambda x: x.get("Score", 0), reverse=True)
 
         # Add rows to table
         for idx, result in enumerate(sorted_results, 1):
             func_name = result["Function"]
             module_name = result["Module"]
-            score = result["Score"]
+            score = result.get("Score", 0)
             percentage = f"{score*100:.1f}%"
 
             # Create progress bar

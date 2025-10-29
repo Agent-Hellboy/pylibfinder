@@ -71,7 +71,6 @@ PyObject* create_match_dict_with_type(const char *module_name,
 
     PyObject *type_obj = is_type ? Py_True : Py_False;
     PyDict_SetItemString(dict_item, "Type", type_obj);
-    Py_DECREF(type_obj);
 
     return dict_item;
 }
