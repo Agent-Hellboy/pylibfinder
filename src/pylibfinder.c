@@ -85,6 +85,7 @@ static int has_substring_match(const char *query, const char *func_name) {
 typedef struct {
     const char *query;
     double threshold;
+    PyObject *modules_dict;  // for checking if items are types
 } SimilarityContext;
 
 static int similarity_processor(const char *module_name,
@@ -99,7 +100,21 @@ static int similarity_processor(const char *module_name,
     }
 
     if (similarity >= ctx->threshold) {
-        PyObject *dict_item = create_match_dict(module_name, function_name, similarity);
+        // Check if the item is a type
+        int is_type = 0;
+        if (ctx->modules_dict != NULL) {
+            PyObject *module = PyDict_GetItemString(ctx->modules_dict, module_name);
+            if (module != NULL) {
+                PyObject *item = PyObject_GetAttrString(module, function_name);
+                if (item != NULL) {
+                    is_type = PyType_Check(item);
+                    Py_DECREF(item);
+                }
+                PyErr_Clear();  // Clear any errors from GetAttr
+            }
+        }
+
+        PyObject *dict_item = create_match_dict_with_type(module_name, function_name, similarity, is_type);
         if (dict_item) {
             PyList_Append(result_list, dict_item);
             Py_DECREF(dict_item);
@@ -122,9 +137,12 @@ static PyObject* find_similar(PyObject* self, PyObject* args) {
     SimilarityContext ctx;
     ctx.query = keyword;
     ctx.threshold = threshold;
+    ctx.modules_dict = NULL; // Initialize to NULL
 
     // Direct module scanning to pass context properly
     PyObject *modules_dict = PyImport_GetModuleDict();
+    ctx.modules_dict = modules_dict; // Assign to context
+
     Py_ssize_t pos = 0;
     PyObject *key, *value;
 
