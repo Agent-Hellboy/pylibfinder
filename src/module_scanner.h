@@ -24,4 +24,10 @@ PyObject* create_match_dict(const char *module_name,
                            const char *function_name,
                            double score);
 
+// Helper to create a result dictionary with type information
+PyObject* create_match_dict_with_type(const char *module_name,
+                                      const char *function_name,
+                                      double score,
+                                      int is_type);
+
 #endif

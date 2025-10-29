@@ -60,3 +60,18 @@ PyObject* create_match_dict(const char *module_name,
 
     return dict_item;
 }
+
+// Helper to create a result dictionary with type information
+PyObject* create_match_dict_with_type(const char *module_name,
+                                      const char *function_name,
+                                      double score,
+                                      int is_type) {
+    PyObject *dict_item = create_match_dict(module_name, function_name, score);
+    if (!dict_item) return NULL;
+
+    PyObject *type_obj = is_type ? Py_True : Py_False;
+    PyDict_SetItemString(dict_item, "Type", type_obj);
+    Py_DECREF(type_obj);
+
+    return dict_item;
+}
