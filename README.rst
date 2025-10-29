@@ -43,9 +43,7 @@ Installation
 
 For stable version
 
-        - clone the repo: ``git clone https://github.com/Agent-Hellboy/pylibfinder``
-        - cd into it: ``cd pylibfinder``
-        - install with pip: ``pip install .`` (on macOS and Linux)
+        - pip install pylibfinder
 
 For development
 
