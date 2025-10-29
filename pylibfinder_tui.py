@@ -29,7 +29,10 @@ class SearchInput(Static):
     """Search input area"""
 
     def compose(self) -> ComposeResult:
-        yield Input(placeholder="Enter keyword (e.g., power, print, parseInt)", id="search-input")
+        yield Input(
+            placeholder="Enter keyword (e.g., power, print, parseInt) with optional threshold and include_private flag",
+            id="search-input",
+        )
 
 
 class SearchApp(App):
@@ -106,16 +109,28 @@ class SearchApp(App):
         parts = query.rsplit(" ", 1)
         keyword = parts[0]
         threshold = 0.5
+        include_private = False
 
         try:
             if len(parts) == 2:
                 threshold = float(parts[1])
-        except ValueError:
+                keyword = parts[0]
+                # Validate threshold
+                if threshold < 0 or threshold > 1:
+                    self.notify("Threshold must be between 0 and 1", severity="warning")
+                    return
+
+            if len(parts) > 2:
+                include_private = parts[2].lower() in ["true", "1", "yes"]
+        except Exception:
             pass
+
+        if not keyword:
+            return
 
         # Perform search
         try:
-            results = pylibfinder.find_similar(keyword, threshold)
+            results = pylibfinder.find_similar(keyword, threshold, include_private=include_private)
             self.display_results(results, keyword, threshold)
         except Exception as e:
             self.display_error(str(e))
@@ -128,14 +143,14 @@ class SearchApp(App):
         if not results:
             return
 
-        # Sort by similarity descending
-        sorted_results = sorted(results, key=lambda x: x["Similarity"], reverse=True)
+        # Sort by score descending (handle missing Score key)
+        sorted_results = sorted(results, key=lambda x: x.get("Score", 0), reverse=True)
 
         # Add rows to table
         for idx, result in enumerate(sorted_results, 1):
             func_name = result["Function"]
             module_name = result["Module"]
-            score = result["Similarity"]
+            score = result.get("Score", 0)
             percentage = f"{score*100:.1f}%"
 
             # Determine color based on score

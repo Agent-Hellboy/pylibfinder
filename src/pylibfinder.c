@@ -6,6 +6,10 @@
 
 /* ========== SIMILARITY MATCHING ========== */
 
+static int is_public_api(const char *function_name) {
+    return function_name && function_name[0] != '_';
+}
+
 static int levenshtein_distance(const char *s1, const char *s2) {
     int len1 = strlen(s1);
     int len2 = strlen(s2);
@@ -85,6 +89,8 @@ static int has_substring_match(const char *query, const char *func_name) {
 typedef struct {
     const char *query;
     double threshold;
+    int include_private;
+    PyObject *modules_dict;  // for checking if items are types
 } SimilarityContext;
 
 static int similarity_processor(const char *module_name,
@@ -93,13 +99,32 @@ static int similarity_processor(const char *module_name,
                                void *user_data) {
     SimilarityContext *ctx = (SimilarityContext *)user_data;
 
+    // Skip private functions (those starting with underscore) unless include_private is set
+    if (!ctx->include_private && !is_public_api(function_name)) {
+        return 0;
+    }
+
     double similarity = calculate_similarity(ctx->query, function_name);
     if (has_substring_match(ctx->query, function_name)) {
         similarity = (similarity + 1.0) / 2.0;
     }
 
     if (similarity >= ctx->threshold) {
-        PyObject *dict_item = create_match_dict(module_name, function_name, similarity);
+        // Check if the item is a type
+        int is_type = 0;
+        if (ctx->modules_dict != NULL) {
+            PyObject *module = PyDict_GetItemString(ctx->modules_dict, module_name);
+            if (module != NULL) {
+                PyObject *item = PyObject_GetAttrString(module, function_name);
+                if (item != NULL) {
+                    is_type = PyType_Check(item);
+                    Py_DECREF(item);
+                }
+                PyErr_Clear();  // Clear any errors from GetAttr
+            }
+        }
+
+        PyObject *dict_item = create_match_dict_with_type(module_name, function_name, similarity, is_type);
         if (dict_item) {
             PyList_Append(result_list, dict_item);
             Py_DECREF(dict_item);
@@ -109,11 +134,14 @@ static int similarity_processor(const char *module_name,
     return 0;
 }
 
-static PyObject* find_similar(PyObject* self, PyObject* args) {
+static PyObject* find_similar(PyObject* self, PyObject* args, PyObject* kwargs) {
     const char *keyword;
     double threshold = 0.5;
+    int include_private = 0;
 
-    if (!PyArg_ParseTuple(args, "s|d", &keyword, &threshold)) {
+    static char *kwlist[] = {"keyword", "threshold", "include_private", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|dp", kwlist, &keyword, &threshold, &include_private)) {
         return NULL;
     }
 
@@ -122,9 +150,13 @@ static PyObject* find_similar(PyObject* self, PyObject* args) {
     SimilarityContext ctx;
     ctx.query = keyword;
     ctx.threshold = threshold;
+    ctx.include_private = include_private;
+    ctx.modules_dict = NULL; // Initialize to NULL
 
     // Direct module scanning to pass context properly
     PyObject *modules_dict = PyImport_GetModuleDict();
+    ctx.modules_dict = modules_dict; // Assign to context
+
     Py_ssize_t pos = 0;
     PyObject *key, *value;
 
@@ -160,7 +192,7 @@ static PyObject* find_similar(PyObject* self, PyObject* args) {
 /* ========== MODULE DEFINITION ========== */
 
 static PyMethodDef module_methods[] = {
-    {"find_similar", find_similar, METH_VARARGS, "Find similar functions in Python stdlib using semantic similarity. Optional threshold parameter (0.0-1.0, default 0.5)."},
+    {"find_similar", (PyCFunction)find_similar, METH_VARARGS | METH_KEYWORDS, "Find similar functions in Python stdlib using semantic similarity. Optional threshold parameter (0.0-1.0, default 0.5) and include_private parameter (default False)."},
     {NULL, NULL, 0, NULL}
 };
 
