@@ -1,42 +1,37 @@
 #!/usr/bin/env python3
 """
 Interactive TUI (Terminal User Interface) for pylibfinder
-Beautiful terminal interface with keyboard navigation and interactive search
+Real-time semantic function search with live results
 """
 
-
 import pylibfinder
-from textual.app import App, ComposeResult, on
+from textual.app import App, ComposeResult
 from textual.widgets import DataTable, Footer, Header, Input, Static
 
 
-class SearchHeader(Static):
-    """Header with title and instructions"""
+class TitleBar(Static):
+    """Simple title bar"""
 
     def render(self) -> str:
-        return """[bold cyan]pylibfinder - Semantic Function Search[/bold cyan]
-[dim]Search for similar functions in Python stdlib[/dim]"""
+        return "[bold cyan]pylibfinder[/bold cyan] - Semantic Function Search"
+
+
+class SearchBox(Static):
+    """Search input wrapper"""
+
+    def compose(self) -> ComposeResult:
+        yield Input(id="search-input", placeholder="Type to search...")
 
 
 class ResultsTable(DataTable):
     """Table displaying search results"""
 
     def on_mount(self) -> None:
-        self.add_columns("#", "Function", "Module", "Score", "Match %")
-
-
-class SearchInput(Static):
-    """Search input area"""
-
-    def compose(self) -> ComposeResult:
-        yield Input(
-            placeholder="Enter keyword (e.g., power, print, parseInt) with optional threshold and include_private flag",
-            id="search-input",
-        )
+        self.add_columns("Function", "Module", "Score")
 
 
 class SearchApp(App):
-    """Interactive TUI application"""
+    """Interactive TUI application with live search"""
 
     BINDINGS = [
         ("ctrl+c", "quit", "Quit"),
@@ -46,144 +41,117 @@ class SearchApp(App):
     CSS = """
     Screen {
         layout: vertical;
-        background: $panel;
+        background: $surface;
     }
 
-    SearchHeader {
+    TitleBar {
         dock: top;
-        height: 3;
+        height: 1;
         background: $boost;
         color: $text;
+        padding: 0 1;
         border: solid $accent;
-        padding: 1;
     }
 
-    SearchInput {
+    SearchBox {
         dock: top;
         height: 3;
         border: solid $accent;
-        padding: 1;
     }
 
     #search-input {
-        border: solid $accent;
-        margin: 1;
+        width: 100%;
+        height: 1;
+        border: none;
+        background: $boost;
+        color: $text;
     }
 
     ResultsTable {
         border: solid $accent;
-        margin: 1;
     }
 
     Footer {
         dock: bottom;
-        color: $text;
-    }
-
-    Static {
-        width: 1fr;
     }
     """
 
-    TITLE = "pylibfinder - Function Search"
+    TITLE = "pylibfinder"
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
-        yield SearchHeader()
-        yield SearchInput()
+        yield TitleBar()
+        yield SearchBox()
         yield ResultsTable(id="results-table")
         yield Footer()
 
     def on_mount(self) -> None:
-        """Initialize the app"""
-        self.query_one("#search-input", Input).focus()
+        """Initialize and focus search input"""
+        input_widget = self.query_one("#search-input", Input)
+        input_widget.focus()
 
-    @on(Input.Submitted)
-    def perform_search(self, event: Input.Submitted) -> None:
-        """Perform search when user submits"""
-        query = event.value.strip()
-        if not query:
+    def watch_search_value(self) -> None:
+        """Trigger search when input changes"""
+        input_widget = self.query_one("#search-input", Input)
+        query = input_widget.value.strip()
+
+        if not query or len(query) < 1:
+            self.query_one("#results-table", ResultsTable).clear()
             return
 
-        # Parse threshold if provided
-        parts = query.rsplit(" ", 1)
-        keyword = parts[0]
-        threshold = 0.5
-        include_private = False
-
         try:
-            if len(parts) == 2:
-                threshold = float(parts[1])
-                keyword = parts[0]
-                # Validate threshold
-                if threshold < 0 or threshold > 1:
-                    self.notify("Threshold must be between 0 and 1", severity="warning")
-                    return
-
-            if len(parts) > 2:
-                include_private = parts[2].lower() in ["true", "1", "yes"]
+            results = pylibfinder.find_similar(query, threshold=0.3)
+            self.display_results(results)
         except Exception:
             pass
 
-        if not keyword:
-            return
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Handle input changes for live search"""
+        self.watch_search_value()
 
-        # Perform search
-        try:
-            results = pylibfinder.find_similar(keyword, threshold, include_private=include_private)
-            self.display_results(results, keyword, threshold)
-        except Exception as e:
-            self.display_error(str(e))
-
-    def display_results(self, results: list[dict], query: str, threshold: float) -> None:
-        """Display search results in the table"""
+    def display_results(self, results: list[dict]) -> None:
+        """Display results in the table"""
         table = self.query_one("#results-table", ResultsTable)
         table.clear()
 
         if not results:
             return
 
-        # Sort by score descending (handle missing Score key)
         sorted_results = sorted(results, key=lambda x: x.get("Score", 0), reverse=True)
 
-        # Add rows to table
-        for idx, result in enumerate(sorted_results, 1):
+        for result in sorted_results[:30]:
             func_name = result["Function"]
             module_name = result["Module"]
             score = result.get("Score", 0)
+            is_type = result.get("is_type", False)
+
             percentage = f"{score*100:.1f}%"
 
-            # Determine color based on score
             if score >= 0.9:
-                color = "green"
+                color = "bright_green"
             elif score >= 0.7:
-                color = "cyan"
+                color = "bright_cyan"
             elif score >= 0.5:
-                color = "yellow"
+                color = "bright_yellow"
             else:
-                color = "red"
+                color = "bright_red"
 
-            # Create progress bar
-            bar_width = 10
+            bar_width = 12
             filled = int(score * bar_width)
-            empty = bar_width - filled
-            bar = "█" * filled + "░" * empty
+            bar = "[" + "=" * filled + "-" * (bar_width - filled) + "]"
+            score_display = f"[{color}]{bar} {percentage}[/{color}]"
 
-            table.add_row(str(idx), f"[{color}]{func_name}[/{color}]", module_name, bar, percentage, key=str(idx))
+            type_tag = " (Type)" if is_type else ""
+            func_display = f"{func_name}{type_tag}"
 
-    def display_error(self, error: str) -> None:
-        """Display error message"""
-        table = self.query_one("#results-table", ResultsTable)
-        table.clear()
-        self.notify(f"Error: {error}", severity="error")
+            table.add_row(func_display, module_name, score_display)
 
     def action_clear_search(self) -> None:
         """Clear search results"""
-        table = self.query_one("#results-table", ResultsTable)
-        table.clear()
         input_widget = self.query_one("#search-input", Input)
         input_widget.value = ""
-        input_widget.focus()
+        table = self.query_one("#results-table", ResultsTable)
+        table.clear()
 
 
 def main():

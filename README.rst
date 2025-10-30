@@ -130,7 +130,7 @@ Then launch the interactive TUI:
   - Cyan: Good match (70%+)
   - Yellow: Fair match (50%+)
   - Red: Low match (<50%)
-
+  
 - **Progress Bars** - Visual representation of similarity scores
 - **Real-time Search** - Search directly in the TUI interface
 
@@ -138,17 +138,10 @@ Then launch the interactive TUI:
 
 1. Start the TUI: ``pylibfinder-tui``
 2. Type your keyword in the search box (e.g., ``power``, ``print``, ``parseInt``)
-3. Optionally add a threshold: ``power 0.7`` (default is 0.5)
-4. Press Enter to search
-5. View results in the formatted table
-6. Press ``Ctrl+L`` to clear results or ``Ctrl+C`` to exit
+3. Every keyword event sends request to the backend
+4. View results in the formatted table
+5. Press ``Ctrl+L`` to clear results or ``Ctrl+C`` to exit
 
-**Example Searches:**
-
-- ``power`` - Find power-related functions
-- ``print 0.8`` - Find functions similar to "print" with high confidence
-- ``parseInt 0.6`` - Find Java-style parseInt alternatives
-- ``parse 0.5 true`` - Find functions similar to "parse" including private APIs
 
 
 Contributing
