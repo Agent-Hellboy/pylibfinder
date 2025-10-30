@@ -23,12 +23,12 @@ def test_find_similar_basic(query):
 
         # Assert that each dictionary contains required keys
         assert "Module" in item
-        assert "Function" in item
+        assert "Object Name" in item
         assert "Score" in item
 
         # Assert that the values are of correct types
         assert isinstance(item["Module"], str)
-        assert isinstance(item["Function"], str)
+        assert isinstance(item["Object Name"], str)
         assert isinstance(item["Score"], float)
 
         # Assert that similarity score is valid (0.0 to 1.0)
@@ -54,7 +54,7 @@ def test_find_similar_exact_match():
     # Find the exact match in results
     exact_match = None
     for item in result:
-        if item["Function"] == "print" and item["Module"] == "builtins":
+        if item["Object Name"] == "print" and item["Module"] == "builtins":
             exact_match = item
             break
 
@@ -75,7 +75,7 @@ def test_find_similar_substring_match():
     # Assert that print_function substring provides matches
     found_print_related = False
     for item in result:
-        if "print" in item["Function"].lower():
+        if "print" in item["Object Name"].lower():
             found_print_related = True
             break
 
@@ -88,7 +88,7 @@ def test_find_similar_excludes_private_by_default():
 
     # Assert that all results are public functions (don't start with _)
     for item in result:
-        assert not item["Function"].startswith("_")
+        assert not item["Object Name"].startswith("_")
 
 
 def test_find_similar_includes_private_when_flag_set():
@@ -101,5 +101,5 @@ def test_find_similar_includes_private_when_flag_set():
 
     # If there are more results, at least some should be private
     if len(result_with_private) > len(result_without_private):
-        has_private = any(item["Function"].startswith("_") for item in result_with_private)
+        has_private = any(item["Object Name"].startswith("_") for item in result_with_private)
         assert has_private
