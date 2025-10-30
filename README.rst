@@ -1,10 +1,10 @@
 pylibfinder (supports Python 3.10 to 3.14 on POSIX)
 ====================================================
 
-- pylibfinder is a Python library that allows you to spot a keyword as a function inside the Python standard library.
-- It provides a convenient way to search for functions that match a given keyword within the standard library modules.
-- With pylibfinder, you can easily identify the modules and functions that are available in Python and gain insights  into their usage and availability.
-- This library is designed to assist developers in finding relevant functions and understanding the   Python standard library better.
+- pylibfinder is a Python library that allows you to spot a keyword as a python object inside the Python standard library.
+- It provides a convenient way to search for objects that match a given keyword within the standard library modules.
+- With pylibfinder, you can easily identify the modules and objects that are available in Python and gain insights  into their usage and availability.
+- This library is designed to assist developers in finding relevant objects and understanding the   Python standard library better.
 
 
 .. image:: https://img.shields.io/pypi/v/pylibfinder
@@ -130,7 +130,7 @@ Then launch the interactive TUI:
   - Cyan: Good match (70%+)
   - Yellow: Fair match (50%+)
   - Red: Low match (<50%)
-  
+
 - **Progress Bars** - Visual representation of similarity scores
 - **Real-time Search** - Search directly in the TUI interface
 

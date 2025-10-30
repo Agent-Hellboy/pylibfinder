@@ -120,7 +120,7 @@ class SearchApp(App):
         sorted_results = sorted(results, key=lambda x: x.get("Score", 0), reverse=True)
 
         for result in sorted_results[:30]:
-            func_name = result["Function"]
+            func_name = result["Object Name"]
             module_name = result["Module"]
             score = result.get("Score", 0)
             is_type = result.get("is_type", False)
