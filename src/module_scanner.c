@@ -62,7 +62,7 @@ PyObject* create_match_dict(const char *module_name,
 }
 
 // Helper to determine object type string
-static const char* get_object_type(PyObject *item) {
+const char* get_object_type(PyObject *item) {
     if (PyType_Check(item)) {
         return "Class";
     }

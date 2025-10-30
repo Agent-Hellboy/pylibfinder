@@ -6,18 +6,14 @@ Real-time semantic function search with live results
 
 import pylibfinder
 from textual.app import App, ComposeResult
-from textual.reactive import reactive
 from textual.widgets import DataTable, Footer, Header, Input, Static
 
 
 class TitleBar(Static):
-    """Simple title bar with filter toggle"""
-
-    show_all = reactive(False)
+    """Simple title bar"""
 
     def render(self) -> str:
-        filter_status = "[red]✓ Callable Only[/red]" if not self.show_all else "[yellow]✗ All Objects[/yellow]"
-        return f"[bold cyan]pylibfinder[/bold cyan] - Search Python Objects | {filter_status} (Press Tab to toggle)"
+        return "[bold cyan]pylibfinder[/bold cyan] - Search Python Objects by Type"
 
 
 class SearchBox(Static):
@@ -40,7 +36,6 @@ class SearchApp(App):
     BINDINGS = [
         ("ctrl+c", "quit", "Quit"),
         ("ctrl+l", "clear_search", "Clear"),
-        ("tab", "toggle_filter", "Toggle Filter"),
     ]
 
     CSS = """
@@ -51,7 +46,7 @@ class SearchApp(App):
 
     TitleBar {
         dock: top;
-        height: 2;
+        height: 1;
         background: $boost;
         color: $text;
         padding: 0 1;
@@ -83,10 +78,6 @@ class SearchApp(App):
 
     TITLE = "pylibfinder"
 
-    def __init__(self):
-        super().__init__()
-        self.callable_only = True
-
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
         yield TitleBar()
@@ -109,7 +100,7 @@ class SearchApp(App):
             return
 
         try:
-            results = pylibfinder.find_similar(query, threshold=0.3, callable_only=self.callable_only)
+            results = pylibfinder.find_similar(query, threshold=0.3, callable_only=False)
             self.display_results(results)
         except Exception:
             pass
@@ -158,14 +149,6 @@ class SearchApp(App):
         input_widget.value = ""
         table = self.query_one("#results-table", ResultsTable)
         table.clear()
-
-    def action_toggle_filter(self) -> None:
-        """Toggle callable_only filter"""
-        self.callable_only = not self.callable_only
-        title_bar = self.query_one("TitleBar")
-        title_bar.show_all = not self.callable_only
-        # Re-run search with new filter
-        self.watch_search_value()
 
 
 def main():
