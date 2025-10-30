@@ -108,6 +108,10 @@ Terminal User Interface (TUI)
 
 **Interactive Search with Beautiful UI:**
 
+.. image:: demo.gif
+   :alt: pylibfinder TUI Demo
+   :width: 100%
+
 To use the interactive terminal interface, install with the TUI extra:
 
 .. code:: bash
