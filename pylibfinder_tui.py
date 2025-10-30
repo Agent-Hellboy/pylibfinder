@@ -13,7 +13,7 @@ class TitleBar(Static):
     """Simple title bar"""
 
     def render(self) -> str:
-        return "[bold cyan]pylibfinder[/bold cyan] - Semantic Function Search"
+        return "[bold cyan]pylibfinder[/bold cyan] - Search Python Objects"
 
 
 class SearchBox(Static):
@@ -27,7 +27,7 @@ class ResultsTable(DataTable):
     """Table displaying search results"""
 
     def on_mount(self) -> None:
-        self.add_columns("Function", "Module", "Score")
+        self.add_columns("Object Name", "Module", "Score")
 
 
 class SearchApp(App):

@@ -49,7 +49,7 @@ PyObject* create_match_dict(const char *module_name,
     }
 
     PyDict_SetItemString(dict_item, "Module", mod_obj);
-    PyDict_SetItemString(dict_item, "Function", func_obj);
+    PyDict_SetItemString(dict_item, "Object Name", func_obj);
     if (score > 0) {
         PyDict_SetItemString(dict_item, "Score", score_obj);
     }
