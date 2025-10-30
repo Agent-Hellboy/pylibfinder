@@ -122,15 +122,17 @@ Then launch the interactive TUI:
 
 **Features:**
 
-- 🎨 **Beautiful Interactive Interface** - Built with Textual for a modern TUI experience
-- ⌨️  **Keyboard Navigation** - Smooth and responsive controls
-- 📊 **Color-Coded Results** - Visual indicators for match quality:
+- **Beautiful Interactive Interface** - Built with Textual for a modern TUI experience
+- **Keyboard Navigation** - Smooth and responsive controls
+- **Color-Coded Results** - Visual indicators for match quality:
+
   - Green: Excellent match (90%+)
   - Cyan: Good match (70%+)
   - Yellow: Fair match (50%+)
   - Red: Low match (<50%)
-- 📈 **Progress Bars** - Visual representation of similarity scores
-- 🔍 **Real-time Search** - Search directly in the TUI interface
+
+- **Progress Bars** - Visual representation of similarity scores
+- **Real-time Search** - Search directly in the TUI interface
 
 **Usage:**
 
