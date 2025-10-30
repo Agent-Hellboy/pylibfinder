@@ -6,14 +6,18 @@ Real-time semantic function search with live results
 
 import pylibfinder
 from textual.app import App, ComposeResult
+from textual.reactive import reactive
 from textual.widgets import DataTable, Footer, Header, Input, Static
 
 
 class TitleBar(Static):
-    """Simple title bar"""
+    """Simple title bar with filter toggle"""
+
+    show_all = reactive(False)
 
     def render(self) -> str:
-        return "[bold cyan]pylibfinder[/bold cyan] - Search Python Objects"
+        filter_status = "[red]✓ Callable Only[/red]" if not self.show_all else "[yellow]✗ All Objects[/yellow]"
+        return f"[bold cyan]pylibfinder[/bold cyan] - Search Python Objects | {filter_status} (Press Tab to toggle)"
 
 
 class SearchBox(Static):
@@ -27,7 +31,7 @@ class ResultsTable(DataTable):
     """Table displaying search results"""
 
     def on_mount(self) -> None:
-        self.add_columns("Object Name", "Module", "Score")
+        self.add_columns("Object Name", "Module", "Type", "Score")
 
 
 class SearchApp(App):
@@ -36,6 +40,7 @@ class SearchApp(App):
     BINDINGS = [
         ("ctrl+c", "quit", "Quit"),
         ("ctrl+l", "clear_search", "Clear"),
+        ("tab", "toggle_filter", "Toggle Filter"),
     ]
 
     CSS = """
@@ -46,7 +51,7 @@ class SearchApp(App):
 
     TitleBar {
         dock: top;
-        height: 1;
+        height: 2;
         background: $boost;
         color: $text;
         padding: 0 1;
@@ -78,6 +83,10 @@ class SearchApp(App):
 
     TITLE = "pylibfinder"
 
+    def __init__(self):
+        super().__init__()
+        self.callable_only = True
+
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
         yield TitleBar()
@@ -100,7 +109,7 @@ class SearchApp(App):
             return
 
         try:
-            results = pylibfinder.find_similar(query, threshold=0.3)
+            results = pylibfinder.find_similar(query, threshold=0.3, callable_only=self.callable_only)
             self.display_results(results)
         except Exception:
             pass
@@ -120,10 +129,10 @@ class SearchApp(App):
         sorted_results = sorted(results, key=lambda x: x.get("Score", 0), reverse=True)
 
         for result in sorted_results[:30]:
-            func_name = result["Object Name"]
+            obj_name = result["Object Name"]
             module_name = result["Module"]
+            obj_type = result.get("Type", "Unknown")
             score = result.get("Score", 0)
-            is_type = result.get("is_type", False)
 
             percentage = f"{score*100:.1f}%"
 
@@ -136,15 +145,12 @@ class SearchApp(App):
             else:
                 color = "bright_red"
 
-            bar_width = 12
+            bar_width = 10
             filled = int(score * bar_width)
             bar = "[" + "=" * filled + "-" * (bar_width - filled) + "]"
             score_display = f"[{color}]{bar} {percentage}[/{color}]"
 
-            type_tag = " (Type)" if is_type else ""
-            func_display = f"{func_name}{type_tag}"
-
-            table.add_row(func_display, module_name, score_display)
+            table.add_row(obj_name, module_name, obj_type, score_display)
 
     def action_clear_search(self) -> None:
         """Clear search results"""
@@ -152,6 +158,14 @@ class SearchApp(App):
         input_widget.value = ""
         table = self.query_one("#results-table", ResultsTable)
         table.clear()
+
+    def action_toggle_filter(self) -> None:
+        """Toggle callable_only filter"""
+        self.callable_only = not self.callable_only
+        title_bar = self.query_one("TitleBar")
+        title_bar.show_all = not self.callable_only
+        # Re-run search with new filter
+        self.watch_search_value()
 
 
 def main():

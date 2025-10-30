@@ -61,6 +61,26 @@ PyObject* create_match_dict(const char *module_name,
     return dict_item;
 }
 
+// Helper to determine object type string
+static const char* get_object_type(PyObject *item) {
+    if (PyType_Check(item)) {
+        return "Class";
+    }
+    if (PyCFunction_Check(item)) {
+        return "Builtin";
+    }
+    if (PyFunction_Check(item)) {
+        return "Function";
+    }
+    if (PyMethod_Check(item)) {
+        return "Method";
+    }
+    if (PyCallable_Check(item)) {
+        return "Callable";
+    }
+    return "Unknown";
+}
+
 // Helper to create a result dictionary with type information
 PyObject* create_match_dict_with_type(const char *module_name,
                                       const char *function_name,
@@ -70,7 +90,24 @@ PyObject* create_match_dict_with_type(const char *module_name,
     if (!dict_item) return NULL;
 
     PyObject *type_obj = is_type ? Py_True : Py_False;
-    PyDict_SetItemString(dict_item, "Type", type_obj);
+    PyDict_SetItemString(dict_item, "is_type", type_obj);
+
+    return dict_item;
+}
+
+// New function to create result dict with object type
+PyObject* create_match_dict_with_object_type(const char *module_name,
+                                             const char *function_name,
+                                             double score,
+                                             const char *object_type) {
+    PyObject *dict_item = create_match_dict(module_name, function_name, score);
+    if (!dict_item) return NULL;
+
+    PyObject *type_str = PyUnicode_FromString(object_type);
+    if (type_str) {
+        PyDict_SetItemString(dict_item, "Type", type_str);
+        Py_DECREF(type_str);
+    }
 
     return dict_item;
 }
