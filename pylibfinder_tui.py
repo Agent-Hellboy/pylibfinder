@@ -13,7 +13,7 @@ class TitleBar(Static):
     """Simple title bar"""
 
     def render(self) -> str:
-        return "[bold cyan]pylibfinder[/bold cyan] - Search Python Objects by Type"
+        return "[bold cyan]pylibfinder[/bold cyan] - Search Python Objects"
 
 
 class SearchBox(Static):
