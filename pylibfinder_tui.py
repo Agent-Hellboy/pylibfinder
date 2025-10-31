@@ -27,7 +27,7 @@ class ResultsTable(DataTable):
     """Table displaying search results"""
 
     def on_mount(self) -> None:
-        self.add_columns("Object Name", "Module", "Score")
+        self.add_columns("Object Name", "Module", "Type", "Score")
 
 
 class SearchApp(App):
@@ -100,7 +100,7 @@ class SearchApp(App):
             return
 
         try:
-            results = pylibfinder.find_similar(query, threshold=0.3)
+            results = pylibfinder.find_similar(query, threshold=0.3, callable_only=False)
             self.display_results(results)
         except Exception:
             pass
@@ -120,10 +120,10 @@ class SearchApp(App):
         sorted_results = sorted(results, key=lambda x: x.get("Score", 0), reverse=True)
 
         for result in sorted_results[:30]:
-            func_name = result["Object Name"]
+            obj_name = result["Object Name"]
             module_name = result["Module"]
+            obj_type = result.get("Type", "Unknown")
             score = result.get("Score", 0)
-            is_type = result.get("is_type", False)
 
             percentage = f"{score*100:.1f}%"
 
@@ -136,15 +136,12 @@ class SearchApp(App):
             else:
                 color = "bright_red"
 
-            bar_width = 12
+            bar_width = 10
             filled = int(score * bar_width)
             bar = "[" + "=" * filled + "-" * (bar_width - filled) + "]"
             score_display = f"[{color}]{bar} {percentage}[/{color}]"
 
-            type_tag = " (Type)" if is_type else ""
-            func_display = f"{func_name}{type_tag}"
-
-            table.add_row(func_display, module_name, score_display)
+            table.add_row(obj_name, module_name, obj_type, score_display)
 
     def action_clear_search(self) -> None:
         """Clear search results"""

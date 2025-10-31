@@ -90,6 +90,7 @@ typedef struct {
     const char *query;
     double threshold;
     int include_private;
+    int callable_only;
     PyObject *modules_dict;  // for checking if items are types
 } SimilarityContext;
 
@@ -110,21 +111,30 @@ static int similarity_processor(const char *module_name,
     }
 
     if (similarity >= ctx->threshold) {
-        // Check if the item is a type
+        // Check if the item is a type and if it's callable
         int is_type = 0;
+        int is_callable = 0;
+        const char *object_type = "Unknown";
         if (ctx->modules_dict != NULL) {
             PyObject *module = PyDict_GetItemString(ctx->modules_dict, module_name);
             if (module != NULL) {
                 PyObject *item = PyObject_GetAttrString(module, function_name);
                 if (item != NULL) {
                     is_type = PyType_Check(item);
+                    is_callable = PyCallable_Check(item);
+                    object_type = get_object_type(item);
                     Py_DECREF(item);
                 }
                 PyErr_Clear();  // Clear any errors from GetAttr
             }
         }
 
-        PyObject *dict_item = create_match_dict_with_type(module_name, function_name, similarity, is_type);
+        // Filter non-callable objects if callable_only flag is set
+        if (ctx->callable_only && !is_callable) {
+            return 0;
+        }
+
+        PyObject *dict_item = create_match_dict_with_object_type(module_name, function_name, similarity, object_type);
         if (dict_item) {
             PyList_Append(result_list, dict_item);
             Py_DECREF(dict_item);
@@ -138,10 +148,11 @@ static PyObject* find_similar(PyObject* self, PyObject* args, PyObject* kwargs) 
     const char *keyword;
     double threshold = 0.5;
     int include_private = 0;
+    int callable_only = 1;
 
-    static char *kwlist[] = {"keyword", "threshold", "include_private", NULL};
+    static char *kwlist[] = {"keyword", "threshold", "include_private", "callable_only", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|dp", kwlist, &keyword, &threshold, &include_private)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|dpp", kwlist, &keyword, &threshold, &include_private, &callable_only)) {
         return NULL;
     }
 
@@ -151,6 +162,7 @@ static PyObject* find_similar(PyObject* self, PyObject* args, PyObject* kwargs) 
     ctx.query = keyword;
     ctx.threshold = threshold;
     ctx.include_private = include_private;
+    ctx.callable_only = callable_only;
     ctx.modules_dict = NULL; // Initialize to NULL
 
     // Direct module scanning to pass context properly
@@ -192,7 +204,7 @@ static PyObject* find_similar(PyObject* self, PyObject* args, PyObject* kwargs) 
 /* ========== MODULE DEFINITION ========== */
 
 static PyMethodDef module_methods[] = {
-    {"find_similar", (PyCFunction)find_similar, METH_VARARGS | METH_KEYWORDS, "Find similar functions in Python stdlib using semantic similarity. Optional threshold parameter (0.0-1.0, default 0.5) and include_private parameter (default False)."},
+    {"find_similar", (PyCFunction)find_similar, METH_VARARGS | METH_KEYWORDS, "Find similar functions in Python stdlib using semantic similarity. Optional threshold parameter (0.0-1.0, default 0.5), include_private parameter (default False), and callable_only parameter (default True)."},
     {NULL, NULL, 0, NULL}
 };
 
